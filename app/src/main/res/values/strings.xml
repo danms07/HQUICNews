@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">HQUICNews</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="load_dialog_title">Connecting</string>
+    <string name="load_dialog_message">Please Wait</string>
+    <string name="error_title">Service unavilable</string>
+    <string name="error_message">Please try it later. Error: </string>
+    <string name="ok">OK</string>
+</resources>
