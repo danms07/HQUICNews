@@ -6,7 +6,9 @@ import org.chromium.net.CronetException
 import org.chromium.net.UrlRequest
 import org.chromium.net.UrlResponseInfo
 import org.json.JSONObject
+import java.net.URLDecoder
 import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 
 class NewsClient(context: Context): UrlRequest.Callback() {
     var hquicService: HQUICService? = null
@@ -37,6 +39,7 @@ class NewsClient(context: Context): UrlRequest.Callback() {
         Log.i(TAG, "onResponseStarted: ")
         val byteBuffer = ByteBuffer.allocateDirect(CAPACITY)
         request.read(byteBuffer)
+
     }
 
     override fun onReadCompleted(

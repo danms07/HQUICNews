@@ -4,13 +4,15 @@ import android.content.Context
 import android.util.Log
 import com.huawei.hms.hquic.HQUICManager
 import org.chromium.net.CronetEngine
+import org.chromium.net.UploadDataProviders
 import org.chromium.net.UrlRequest
 import java.net.MalformedURLException
 import java.net.URL
+import java.nio.ByteBuffer
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class HQUICService (val context: Context){
+class HQUICService(val context: Context) {
 
     private val TAG = "HQUICService"
 
@@ -23,7 +25,6 @@ class HQUICService (val context: Context){
     private var cronetEngine: CronetEngine? = null
 
     private var callback: UrlRequest.Callback? = null
-
 
 
     /**
@@ -53,7 +54,7 @@ class HQUICService (val context: Context){
         if (cronetEngine != null) {
             return cronetEngine
         }
-        val builder= CronetEngine.Builder(context)
+        val builder = CronetEngine.Builder(context)
         builder.enableQuic(true)
         builder.addQuicHint(getHost(url), DEFAULT_PORT, DEFAULT_ALTERNATEPORT)
         cronetEngine = builder.build()
@@ -65,13 +66,29 @@ class HQUICService (val context: Context){
      *
      * @param url Request URL.
      * @param method method Method type.
+     * @param headers Request Headers
+     * @param body Request body
      * @return UrlRequest urlrequest instance.
      */
-    private fun builRequest(url: String, method: String): UrlRequest? {
+    private fun builRequest(
+        url: String,
+        method: String,
+        headers: HashMap<String, String>?,
+        body:ByteArray?
+    ): UrlRequest? {
         val cronetEngine: CronetEngine? = createCronetEngine(url)
-        val requestBuilder= cronetEngine?.newUrlRequestBuilder(url, callback, executor)
+        val requestBuilder = cronetEngine?.newUrlRequestBuilder(url, callback, executor)
         requestBuilder?.apply {
             setHttpMethod(method)
+            if(method=="POST"){
+                body?.let {
+                    setUploadDataProvider(UploadDataProviders.create(ByteBuffer.wrap(it)), executor) }
+            }
+            headers?.let{
+                for (key in it.keys) {
+                    addHeader(key, headers[key])
+                }
+            }
             return build()
         }
         return null
@@ -82,10 +99,12 @@ class HQUICService (val context: Context){
      *
      * @param url Request URL.
      * @param method Request method type.
+     * @param headers Request Headers
+     * @param body Request body
      */
-    fun sendRequest(url: String, method: String) {
+    fun sendRequest(url: String, method: String, headers: HashMap<String, String>?=null,body:ByteArray?=null) {
         Log.i(TAG, "callURL: url is " + url + "and method is " + method)
-        val urlRequest: UrlRequest? = builRequest(url, method)
+        val urlRequest: UrlRequest? = builRequest(url, method, headers,body)
         urlRequest?.apply { urlRequest.start() }
     }
 
@@ -109,5 +128,4 @@ class HQUICService (val context: Context){
     fun setCallback(mCallback: UrlRequest.Callback?) {
         callback = mCallback
     }
-
 }
