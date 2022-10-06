@@ -5,6 +5,7 @@ import android.util.Log
 import org.chromium.net.CronetException
 import org.chromium.net.UrlRequest
 import org.chromium.net.UrlResponseInfo
+import org.json.JSONException
 import org.json.JSONObject
 import java.net.URLDecoder
 import java.nio.ByteBuffer
@@ -51,24 +52,29 @@ class NewsClient(context: Context): UrlRequest.Callback() {
         val readed=String(byteBuffer.array(), byteBuffer.arrayOffset(), byteBuffer.position())
         response.append(readed)
         Log.e("Response", readed)
+        Log.e("Response","_________________________________________")
         request.read(ByteBuffer.allocateDirect(CAPACITY))
     }
 
     override fun onSucceeded(request: UrlRequest?, info: UrlResponseInfo?) {
         //If everything is ok you can read the response body
-        val json=JSONObject(response.toString())
-        val array=json.getJSONArray("articles")
-        val list=ArrayList<Article>()
-        for (i in 0 until array.length()){
-            val article=array.getJSONObject(i)
-            val author=article.getString("author")
-            val title=article.getString("title")
-            val description=article.getString("description")
-            val time=article.getString("publishedAt")
-            val url=article.getString("url")
-            list.add(Article(author, title, description, url, time))
+        try{
+            val json=JSONObject(response.toString())
+            val array=json.getJSONArray("articles")
+            val list=ArrayList<Article>()
+            for (i in 0 until array.length()){
+                val article=array.getJSONObject(i)
+                val author=article.getString("author")
+                val title=article.getString("title")
+                val description=article.getString("description")
+                val time=article.getString("publishedAt")
+                val url=article.getString("url")
+                list.add(Article(author, title, description, url, time))
+            }
+            listener?.onSuccess(list)
+        }catch(e:JSONException){
+            listener?.onFailure(e.toString())
         }
-        listener?.onSuccess(list)
     }
 
     override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {

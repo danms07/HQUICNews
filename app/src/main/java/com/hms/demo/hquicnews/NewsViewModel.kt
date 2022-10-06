@@ -9,9 +9,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class NewsViewModel : ViewModel(), NewsClient.NewsClientListener {
-    private val API_KEY="YOUR_API_KEY" //get your API key here: https://newsapi.org/register
-    private val URL = "https://newsapi.org/v2/top-headlines?apiKey=$API_KEY"
-    private val METHOD = "GET"
+    companion object{
+        private const val API_KEY="ac0805f2465f4f89853f569ad67085cb" //get your API key here: https://newsapi.org/register
+        const val URL = "https://newsapi.org/v2/top-headlines?apiKey=$API_KEY"
+        const val METHOD = "GET"
+    }
 
     var listener: NewsViewModelListener?=null
     var newsClient:NewsClient?=null
@@ -27,6 +29,7 @@ class NewsViewModel : ViewModel(), NewsClient.NewsClientListener {
             newsClient=NewsClient(context)
         }
         val url= "$URL&country=$country"
+        Log.e("url",url)
         newsClient?.apply {
             listener=this@NewsViewModel
             getNews(url,METHOD)

@@ -10,7 +10,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class NewsAdapter(private val news:ArrayList<Article>,private val newsVM:NewsViewModel): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter(private val newsVM:NewsViewModel): RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+
+    var news:ArrayList<Article> =ArrayList()
 
     class NewsViewHolder(private val itemBinding: ArticleBinding) : RecyclerView.ViewHolder(itemBinding.root){
         public fun bind(article: Article, newsVM: NewsViewModel){
